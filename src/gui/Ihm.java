@@ -21,226 +21,222 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import aif.Aif;
 import aif.TableModelAif;
 
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-
 public final class Ihm extends JFrame {
 
-	private static final long serialVersionUID = 1L;
-	
-	private static final String FOLDER = "/icon_folder_32.png";
-	private static final String CORBEILLE = "/icon_corbeille_32.png";
-	private static final String STACKS = "/icon_stack_32.png";
-	
-	private static final GridBagConstraints gbc = new GridBagConstraints();
-	private TableModelAif model;
+    private static final long serialVersionUID = 1L;
 
-	public Ihm() {
+    private static final String FOLDER = "/icon_folder_32.png";
+    private static final String CORBEILLE = "/icon_corbeille_32.png";
+    private static final String STACKS = "/icon_stack_32.png";
 
-		super("AIF Tools");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+    private static final GridBagConstraints gbc = new GridBagConstraints();
+    private TableModelAif model;
 
-		final Container root = getContentPane();
+    public Ihm() {
 
-		root.setLayout(new GridBagLayout());
+        super("AIF Tools");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-		final JButton btOpen = new JButton(new ImageIcon(getClass().getResource(FOLDER)));
-		btOpen.setToolTipText("Ouvrir fichiers AIF");
-		btOpen.addActionListener(new ActionListener() {
+        final Container root = getContentPane();
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+        root.setLayout(new GridBagLayout());
 
-				final JFileChooser fc = new JFileChooser();
-				fc.setMultiSelectionEnabled(true);
-				fc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
-				fc.setFileFilter(new FileFilter() {
+        final JButton btOpen = new JButton(new ImageIcon(getClass().getResource(FOLDER)));
+        btOpen.setToolTipText("Ouvrir fichiers AIF");
+        btOpen.addActionListener(new ActionListener() {
 
-					@Override
-					public String getDescription() {
-						return "Fichier AIF (*.aif)";
-					}
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-					@Override
-					public boolean accept(File f) {
-						if(f.isDirectory())
-						{
-							return true;
-						}
-						return f.getName().toLowerCase().endsWith("aif");
-					}
-				});
-				final int reponse = fc.showOpenDialog(Ihm.this);
+                final JFileChooser fc = new JFileChooser();
+                fc.setMultiSelectionEnabled(true);
+                fc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+                fc.setFileFilter(new FileFilter() {
 
-				if (reponse == JFileChooser.APPROVE_OPTION) {
+                    @Override
+                    public String getDescription() {
+                        return "Fichier AIF (*.aif)";
+                    }
 
-					final File[] selectedFiles = fc.getSelectedFiles();
-					final Aif[] tabAif = new Aif[selectedFiles.length];
+                    @Override
+                    public boolean accept(File f) {
+                        if (f.isDirectory()) {
+                            return true;
+                        }
+                        return f.getName().toLowerCase().endsWith("aif");
+                    }
+                });
+                final int reponse = fc.showOpenDialog(Ihm.this);
 
-					for(int i = 0; i < selectedFiles.length; i++)
-					{
-						tabAif[i] = new Aif(selectedFiles[i]);
-					}
-					model.addAif(tabAif);
-				}
-			}
-		});
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0;
-		gbc.weighty = 0;
-		gbc.insets = new Insets(5, 5, 0, 0);
-		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-		root.add(btOpen, gbc);
+                if (reponse == JFileChooser.APPROVE_OPTION) {
 
-		final JButton btClear = new JButton(new ImageIcon(getClass().getResource(CORBEILLE)));
-		btClear.setToolTipText("Effacer le tableau");
-		btClear.addActionListener(new ActionListener() {
+                    final File[] selectedFiles = fc.getSelectedFiles();
+                    final Aif[] tabAif = new Aif[selectedFiles.length];
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				model.clearTable();
-			}
-		});
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0;
-		gbc.weighty = 0;
-		gbc.insets = new Insets(5, 5, 0, 0);
-		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-		root.add(btClear, gbc);
+                    for (int i = 0; i < selectedFiles.length; i++) {
+                        tabAif[i] = new Aif(selectedFiles[i]);
+                    }
+                    model.addAif(tabAif);
+                }
+            }
+        });
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        root.add(btOpen, gbc);
 
-		final JButton btCompil = new JButton(new ImageIcon(getClass().getResource(STACKS)));
-		btCompil.setToolTipText("Compiler les fichiers");
-		btCompil.addActionListener(new ActionListener() {
+        final JButton btClear = new JButton(new ImageIcon(getClass().getResource(CORBEILLE)));
+        btClear.setToolTipText("Effacer le tableau");
+        btClear.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.clearTable();
+            }
+        });
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        root.add(btClear, gbc);
 
-				final JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setDialogTitle("Enregistement du fichier");
-				fileChooser.setFileFilter(new FileNameExtensionFilter("Fichier AIF (*.aif)", "aif"));
-				fileChooser.setSelectedFile(new File(".aif"));
+        final JButton btCompil = new JButton(new ImageIcon(getClass().getResource(STACKS)));
+        btCompil.setToolTipText("Compiler les fichiers");
+        btCompil.addActionListener(new ActionListener() {
 
-				final int rep = fileChooser.showSaveDialog(null);
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-				if (rep == JFileChooser.APPROVE_OPTION) {
+                final JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Enregistement du fichier");
+                fileChooser.setFileFilter(new FileNameExtensionFilter("Fichier AIF (*.aif)", "aif"));
+                fileChooser.setSelectedFile(new File(".aif"));
 
-					final Thread thread = new Thread(new Runnable() {
+                final int rep = fileChooser.showSaveDialog(null);
 
-						@Override
-						public void run() {
+                if (rep == JFileChooser.APPROVE_OPTION) {
 
-							setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    final Thread thread = new Thread(new Runnable() {
 
-							final Aif newAif = Aif.mergeAif(model.getListAif());
-							Aif.writeAif(fileChooser.getSelectedFile(), newAif);
+                        @Override
+                        public void run() {
 
-							setCursor(Cursor.getDefaultCursor());
+                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-							JOptionPane.showMessageDialog(Ihm.this, "Compilation terminee !");
-						}
-					});
-					thread.start();
-				}
-			}
-		});
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0;
-		gbc.weighty = 0;
-		gbc.insets = new Insets(5, 5, 0, 0);
-		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-		root.add(btCompil, gbc);
+                            final Aif newAif = Aif.mergeAif(model.getListAif());
+                            Aif.writeAif(fileChooser.getSelectedFile(), newAif);
 
-		model = new TableModelAif();
+                            setCursor(Cursor.getDefaultCursor());
 
-		final JTable table = new JTable(model);
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 3;
-		gbc.gridheight = 1;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.CENTER;
-		root.add(new JScrollPane(table), gbc);
+                            JOptionPane.showMessageDialog(Ihm.this, "Compilation terminee !");
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        });
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        root.add(btCompil, gbc);
 
-		table.addKeyListener(new KeyListener() {
+        model = new TableModelAif();
 
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
+        final JTable table = new JTable(model);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+        root.add(new JScrollPane(table), gbc);
 
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
+        table.addKeyListener(new KeyListener() {
 
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == 127)
-				{
-					model.removeAif(table.getSelectedRows());
-				}
-			}
-		});
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
 
-		pack();
-		setMinimumSize(new Dimension(getWidth(), getHeight()));
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
 
-	}
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == 127) {
+                    model.removeAif(table.getSelectedRows());
+                }
+            }
+        });
 
-	public static void main(String[] args) {
+        pack();
+        setMinimumSize(new Dimension(getWidth(), getHeight()));
+        setVisible(true);
+        setLocationRelativeTo(null);
 
-		try {
+    }
 
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Windows".equals(info.getName())) {
-					try {
-						UIManager.setLookAndFeel(info.getClassName());
-					} catch (ClassNotFoundException e1) {
-						e1.printStackTrace();
-					} catch (InstantiationException e1) {
-						e1.printStackTrace();
-					} catch (IllegalAccessException e1) {
-						e1.printStackTrace();
-					} catch (UnsupportedLookAndFeelException e1) {
-						e1.printStackTrace();
-					}
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public static void main(String[] args) {
 
-		SwingUtilities.invokeLater(new Runnable() {
+        try {
 
-			@Override
-			public void run() {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Windows".equals(info.getName())) {
+                    try {
+                        UIManager.setLookAndFeel(info.getClassName());
+                    } catch (ClassNotFoundException e1) {
+                        e1.printStackTrace();
+                    } catch (InstantiationException e1) {
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        e1.printStackTrace();
+                    } catch (UnsupportedLookAndFeelException e1) {
+                        e1.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-				final Ihm ihm = new Ihm();
-				ihm.setVisible(true);
-			}
-		});
+        SwingUtilities.invokeLater(new Runnable() {
 
-	}
+            @Override
+            public void run() {
+
+                new Ihm();
+            }
+        });
+
+    }
 
 }

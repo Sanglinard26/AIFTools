@@ -6,7 +6,7 @@ package aif;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Measure {
+public class Measure implements Comparable<Measure> {
 
     private String name;
     private String unit;
@@ -46,10 +46,15 @@ public class Measure {
     public String toString() {
         return this.name;
     }
-    
+
     @Override
     public boolean equals(Object name) {
-    	return this.name.equals(name.toString());
+        return this.name.equals(name.toString());
+    }
+
+    @Override
+    public int compareTo(Measure measure) {
+        return this.name.compareToIgnoreCase(measure.getName());
     }
 
 }
