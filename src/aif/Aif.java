@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -155,7 +155,7 @@ public final class Aif {
      * @param listAif : Une liste d'Aif
      * @return Un nouvel Aif avec la compilation des Aif entrants
      */
-    public static final Aif mergeAif(List<Aif> listAif) {
+    public static final Aif mergeAif(List<Aif> listAif, boolean alphaOrder) {
         final StringBuilder name = new StringBuilder();
 
         for (Aif aif : listAif) {
@@ -167,7 +167,7 @@ public final class Aif {
         traceur.addItem(new Item("NOMS_AIF", "-", listAif.toString()));
 
         // Check des entetes
-        final Map<String, Integer> entetes = new HashMap<String, Integer>();
+        final Map<String, Integer> entetes = new LinkedHashMap<String, Integer>();
         for (Aif aif : listAif) {
             for (Measure measure : aif.getMeasures()) {
                 String nameMeasure = measure.getName();
@@ -219,7 +219,9 @@ public final class Aif {
             }
         }
 
-        Collections.sort(newMeasures);
+        if (alphaOrder) {
+            Collections.sort(newMeasures);
+        }
 
         return new Aif(name.toString(), traceur, newMeasures);
     }

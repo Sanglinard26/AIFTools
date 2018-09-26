@@ -14,6 +14,7 @@ import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -38,6 +39,7 @@ public final class Ihm extends JFrame {
     private static final String STACKS = "/icon_stack_32.png";
 
     private static final GridBagConstraints gbc = new GridBagConstraints();
+    private JCheckBox chkOrdreAlpha;
     private TableModelAif model;
 
     public Ihm() {
@@ -142,7 +144,7 @@ public final class Ihm extends JFrame {
 
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-                            final Aif newAif = Aif.mergeAif(model.getListAif());
+                            final Aif newAif = Aif.mergeAif(model.getListAif(), chkOrdreAlpha.isSelected());
                             Aif.writeAif(fileChooser.getSelectedFile(), newAif);
 
                             setCursor(Cursor.getDefaultCursor());
@@ -165,13 +167,26 @@ public final class Ihm extends JFrame {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         root.add(btCompil, gbc);
 
+        chkOrdreAlpha = new JCheckBox("Trier les voies par ordre alphabetique", false);
+        chkOrdreAlpha.setToolTipText("Option decochee on garde l'ordre du premier fichier");
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.anchor = GridBagConstraints.WEST;
+        root.add(chkOrdreAlpha, gbc);
+
         model = new TableModelAif();
 
         final JTable table = new JTable(model);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         gbc.gridheight = 1;
         gbc.weightx = 1;
         gbc.weighty = 1;
@@ -199,6 +214,7 @@ public final class Ihm extends JFrame {
 
         pack();
         setMinimumSize(new Dimension(getWidth(), getHeight()));
+        setResizable(false);
         setVisible(true);
         setLocationRelativeTo(null);
 
