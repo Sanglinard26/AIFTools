@@ -39,7 +39,7 @@ public final class Ihm extends JFrame {
     private static final String STACKS = "/icon_stack_32.png";
 
     private static final GridBagConstraints gbc = new GridBagConstraints();
-    private JCheckBox chkOrdreAlpha;
+    private JCheckBox chkOrdreAlpha, chkInvalidMeasure;
     private TableModelAif model;
 
     public Ihm() {
@@ -82,9 +82,10 @@ public final class Ihm extends JFrame {
 
                     final File[] selectedFiles = fc.getSelectedFiles();
                     final Aif[] tabAif = new Aif[selectedFiles.length];
+                    final boolean removeInvalidPoint = chkInvalidMeasure.isSelected();
 
                     for (int i = 0; i < selectedFiles.length; i++) {
-                        tabAif[i] = new Aif(selectedFiles[i]);
+                        tabAif[i] = new Aif(selectedFiles[i], removeInvalidPoint);
                     }
                     model.addAif(tabAif);
                 }
@@ -94,7 +95,7 @@ public final class Ihm extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.insets = new Insets(5, 5, 0, 0);
@@ -114,7 +115,7 @@ public final class Ihm extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.insets = new Insets(5, 5, 0, 0);
@@ -160,7 +161,7 @@ public final class Ihm extends JFrame {
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.insets = new Insets(5, 5, 0, 0);
@@ -179,13 +180,26 @@ public final class Ihm extends JFrame {
         gbc.insets = new Insets(5, 5, 0, 0);
         gbc.anchor = GridBagConstraints.WEST;
         root.add(chkOrdreAlpha, gbc);
+        
+        chkInvalidMeasure = new JCheckBox("Supprimer les points invalides", false);
+        chkInvalidMeasure.setToolTipText("Fonction utilisee pendant l'import de fichier");
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(0, 5, 0, 0);
+        gbc.anchor = GridBagConstraints.WEST;
+        root.add(chkInvalidMeasure, gbc);
 
         model = new TableModelAif();
 
         final JTable table = new JTable(model);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.gridwidth = 4;
         gbc.gridheight = 1;
         gbc.weightx = 1;
