@@ -11,6 +11,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,6 +37,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import aif.Aif;
 import aif.TableModelAif;
+import utils.Utilitaire;
 
 public final class Ihm extends JFrame {
 
@@ -60,7 +69,7 @@ public final class Ihm extends JFrame {
 
                 final JFileChooser fc = new JFileChooser();
                 fc.setMultiSelectionEnabled(true);
-                fc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+                fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fc.setFileFilter(new FileFilter() {
 
                     @Override
@@ -80,14 +89,39 @@ public final class Ihm extends JFrame {
 
                 if (reponse == JFileChooser.APPROVE_OPTION) {
 
-                    final File[] selectedFiles = fc.getSelectedFiles();
-                    final Aif[] tabAif = new Aif[selectedFiles.length];
+                    final Finder finder = new Finder();
+                    final List<File> selectedFilesToCompil = new ArrayList<File>();
+
+                    for (File selFile : fc.getSelectedFiles()) {
+                        if (selFile.isDirectory()) {
+                            try {
+                                Files.walkFileTree(selFile.toPath(), finder);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            selectedFilesToCompil.add(selFile);
+                        }
+                    }
+
+                    selectedFilesToCompil.addAll(finder.getFilesToCompil());
+
+                    final Aif[] tabAif = new Aif[selectedFilesToCompil.size()];
                     final boolean removeInvalidPoint = chkInvalidMeasure.isSelected();
 
-                    for (int i = 0; i < selectedFiles.length; i++) {
-                        tabAif[i] = new Aif(selectedFiles[i], removeInvalidPoint);
-                    }
-                    model.addAif(tabAif);
+                    final Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < selectedFilesToCompil.size(); i++) {
+                                tabAif[i] = new Aif(selectedFilesToCompil.get(i), removeInvalidPoint);
+                            }
+                            model.addAif(tabAif);
+                        }
+                    });
+
+                    thread.start();
+
                 }
             }
         });
@@ -180,7 +214,7 @@ public final class Ihm extends JFrame {
         gbc.insets = new Insets(5, 5, 0, 0);
         gbc.anchor = GridBagConstraints.WEST;
         root.add(chkOrdreAlpha, gbc);
-        
+
         chkInvalidMeasure = new JCheckBox("Supprimer les points invalides", false);
         chkInvalidMeasure.setToolTipText("Fonction utilisee pendant l'import de fichier");
         gbc.fill = GridBagConstraints.NONE;
@@ -232,6 +266,27 @@ public final class Ihm extends JFrame {
         setVisible(true);
         setLocationRelativeTo(null);
 
+    }
+
+    private static class Finder extends SimpleFileVisitor<Path> {
+
+        private final List<File> filesToCompil;
+
+        public Finder() {
+            filesToCompil = new ArrayList<File>();
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            if (Utilitaire.getExtension(file.toFile()).equals("aif")) {
+                filesToCompil.add(file.toFile());
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        private final List<File> getFilesToCompil() {
+            return filesToCompil;
+        }
     }
 
     public static void main(String[] args) {
