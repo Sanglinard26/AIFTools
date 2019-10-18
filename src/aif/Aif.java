@@ -57,7 +57,6 @@ public final class Aif {
         final String TRACEUR = "[Traceur]";
         final String DONNEES = "[Donnees]";
         final String TAB = "\t";
-        final char tabulation = '\t';
         final Pattern REGEX_STAR = Pattern.compile("[*]+");
 
         try (BufferedReader bf = new BufferedReader(new FileReader(file))) {
@@ -189,6 +188,20 @@ public final class Aif {
 
     public final long getFileSize() {
         return fileSize;
+    }
+    
+    public final void removeWasteMeasure()
+    {
+    	Measure measure;
+    	
+    	for(int i = this.datas.size()-1; i >= 0 ; i--)
+    	{
+    		measure = this.datas.get(i);
+    		if(measure.getWasted())
+    		{
+    			this.datas.remove(measure);
+    		}
+    	}
     }
 
     /**

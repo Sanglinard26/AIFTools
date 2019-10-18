@@ -31,11 +31,9 @@ final class MeasureModel extends AbstractTableModel {
     private static final String[] ENTETES = new String[] { "Nom voie", "Cocher pour supprimer?" };
 
     private List<Measure> listElements;
-    private List<Boolean> listDrawn;
 
     public MeasureModel() {
         listElements = new ArrayList<Measure>();
-        listDrawn = new ArrayList<Boolean>();
     }
 
     @Override
@@ -78,7 +76,7 @@ final class MeasureModel extends AbstractTableModel {
         case 0:
             return listElements.get(row);
         case 1:
-            return listDrawn.get(row);
+        	return listElements.get(row).getWasted();
         default:
             return null;
         }
@@ -87,20 +85,18 @@ final class MeasureModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        boolean oldValue = this.listDrawn.get(rowIndex);
-        this.listDrawn.set(rowIndex, !oldValue);
+        boolean oldValue = listElements.get(rowIndex).getWasted();
+    	listElements.get(rowIndex).setWasted(!oldValue);
         fireTableCellUpdated(rowIndex, 1);
     }
 
     public final void clearList() {
         this.listElements.clear();
-        this.listDrawn.clear();
         fireTableDataChanged();
     }
 
     public final void addElement(Measure element) {
         this.listElements.add(element);
-        this.listDrawn.add(false);
         fireTableRowsInserted(getRowCount() - 1, getRowCount() - 1);
     }
 

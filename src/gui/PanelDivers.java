@@ -32,6 +32,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
 import aif.Aif;
+import aif.Config;
 import aif.Measure;
 import utils.Utilitaire;
 
@@ -47,6 +48,7 @@ public final class PanelDivers extends JPanel {
 
     private final DefaultListModel<Aif> dataModel;
     private MeasureModel measureModel;
+    private Config config;
 
     public PanelDivers() {
 
@@ -108,6 +110,10 @@ public final class PanelDivers extends JPanel {
                                 tabAif[i] = new Aif(selectedFilesToCompil.get(i), false);
                                 dataModel.addElement(tabAif[i]);
                             }
+                            if(config != null && config.getDatasets().size()>0)
+                            {
+                            	markMeasureToWaste();
+                            }
                         }
                     });
 
@@ -156,7 +162,12 @@ public final class PanelDivers extends JPanel {
         });
 
         final JButton btConfig = new JButton(new ImageIcon(getClass().getResource(CONFIG)));
-        btOpen.setToolTipText("Charger une configuration");
+        btConfig.setToolTipText("<html><p>Fichier *.ini avec la structure suivante :"
+        + "<p>[AIFTOOLS]"
+        + "<p>DATASET1"
+        + "<p>DATASET2"
+        + "<p>DATASET3"
+        + "<p>...");
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -167,9 +178,43 @@ public final class PanelDivers extends JPanel {
         gbc.insets = new Insets(5, 5, 0, 0);
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         add(btConfig, gbc);
+        btConfig.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				final JFileChooser fc = new JFileChooser();
+                fc.setMultiSelectionEnabled(true);
+                fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fc.setFileFilter(new FileFilter() {
+
+                    @Override
+                    public String getDescription() {
+                        return "Fichier de config (*.ini)";
+                    }
+
+                    @Override
+                    public boolean accept(File f) {
+                        if (f.isDirectory()) {
+                            return true;
+                        }
+                        return f.getName().toLowerCase().endsWith("ini");
+                    }
+                });
+
+                if (fc.showOpenDialog(PanelDivers.this) == JFileChooser.APPROVE_OPTION) {
+                	config = new Config(fc.getSelectedFile());
+                	if(dataModel.size()>0)
+                	{
+                		markMeasureToWaste();
+                	}
+                }
+				
+			}
+		});
 
         final JButton btSave = new JButton(new ImageIcon(getClass().getResource(SAVE)));
-        btOpen.setToolTipText("Enregistrer les fichiers AIF de la liste");
+        btSave.setToolTipText("Enregistrer les fichiers AIF de la liste");
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -198,6 +243,7 @@ public final class PanelDivers extends JPanel {
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
                             for (int i = 0; i < dataModel.size(); i++) {
+                            	dataModel.get(i).removeWasteMeasure();
                                 Aif.writeAif(new File(chooser.getSelectedFile() + "\\" + dataModel.get(i).toString() + "_new.aif"), dataModel.get(i));
                             }
 
@@ -225,6 +271,23 @@ public final class PanelDivers extends JPanel {
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         add(new JScrollPane(tabMeasure), gbc);
 
+    }
+    
+    private final void markMeasureToWaste(){
+    	Measure measureToWaste;
+		for(int i = 0; i < dataModel.size(); i++)
+		{
+			for(String dataset : config.getDatasets())
+			{
+				measureToWaste = new Measure(dataset);
+				int idx = dataModel.get(i).getMeasures().indexOf(measureToWaste);
+				if(idx > -1)
+				{
+					dataModel.get(i).getMeasures().get(idx).setWasted(true);
+					measureModel.fireTableDataChanged();
+				}
+			}
+		}
     }
 
     private static class Finder extends SimpleFileVisitor<Path> {
