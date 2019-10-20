@@ -55,7 +55,8 @@ final class MeasureModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return (columnIndex == 1) ? true : false;
+        //return (columnIndex == 1) ? true : false;
+        return true;
 
     }
 
@@ -82,12 +83,20 @@ final class MeasureModel extends AbstractTableModel {
         }
 
     }
+    
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        boolean oldValue = listElements.get(rowIndex).getWasted();
-    	listElements.get(rowIndex).setWasted(!oldValue);
-        fireTableCellUpdated(rowIndex, 1);
+    	if(columnIndex == 0)
+    	{
+    		listElements.get(rowIndex).setName(aValue.toString());
+    		fireTableCellUpdated(rowIndex, 0);
+    	}else{
+    		boolean oldValue = listElements.get(rowIndex).getWasted();
+        	listElements.get(rowIndex).setWasted(!oldValue);
+            fireTableCellUpdated(rowIndex, 1);
+    	}
+        
     }
 
     public final void clearList() {
