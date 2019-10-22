@@ -9,6 +9,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -29,8 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
@@ -53,14 +55,16 @@ public final class PanelDivers extends JPanel {
 	private final DefaultListModel<Aif> dataModel;
 	private MeasureModel measureModel;
 	private Config config;
+	
+	final JList<Aif> listAif;
+	private final JCheckBox checkApply;
 
 	public PanelDivers() {
 
 		setLayout(new GridBagLayout());
 		
-		final JCheckBox checkConfig = new JCheckBox("Activation configuration");
-		checkConfig.setHorizontalTextPosition(SwingConstants.LEFT);
-		checkConfig.setEnabled(false);
+		checkApply = new JCheckBox("Appliquer les changements sur tous les AIF");
+		checkApply.setHorizontalTextPosition(SwingConstants.LEFT);
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridx = 0;
 		gbc.gridy = 3;
@@ -70,18 +74,32 @@ public final class PanelDivers extends JPanel {
 		gbc.weighty = 0;
 		gbc.insets = new Insets(5, 5, 0, 0);
 		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+		add(checkApply, gbc);
+		
+		final JCheckBox checkConfig = new JCheckBox("Activation configuration");
+		checkConfig.setHorizontalTextPosition(SwingConstants.LEFT);
+		checkConfig.setEnabled(false);
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.gridwidth = 2;
+		gbc.gridheight = 1;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+		gbc.insets = new Insets(5, 5, 0, 0);
+		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
 		add(checkConfig, gbc);
-		checkConfig.addChangeListener(new ChangeListener() {
-
+		checkConfig.addItemListener(new ItemListener() {
+			
 			@Override
-			public void stateChanged(ChangeEvent e) {
+			public void itemStateChanged(ItemEvent e) {
 				if(config != null && checkConfig.isSelected())
 				{
-					markMeasureToWaste();
+					markMeasureToWaste(config.getDatasets());
 				}else{
-					unMarkMeasureToWaste();
+					unMarkMeasureToWaste(null);
 				}
-
+				
 			}
 		});
 
@@ -143,7 +161,7 @@ public final class PanelDivers extends JPanel {
 							}
 							if(config != null && config.getDatasets().size()>0 && checkConfig.isSelected())
 							{
-								markMeasureToWaste();
+								markMeasureToWaste(config.getDatasets());
 							}
 						}
 					});
@@ -165,7 +183,7 @@ public final class PanelDivers extends JPanel {
 		add(btOpen, gbc);
 
 		dataModel = new DefaultListModel<Aif>();
-		final JList<Aif> listAif = new JList<Aif>(dataModel);
+		listAif = new JList<Aif>(dataModel);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -173,7 +191,7 @@ public final class PanelDivers extends JPanel {
 		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 0;
-		gbc.insets = new Insets(5, 5, 0, 0);
+		gbc.insets = new Insets(5, 5, 0, 5);
 		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
 		add(new JScrollPane(listAif), gbc);
 		listAif.addListSelectionListener(new ListSelectionListener() {
@@ -236,10 +254,9 @@ public final class PanelDivers extends JPanel {
 				if (fc.showOpenDialog(PanelDivers.this) == JFileChooser.APPROVE_OPTION) {
 					config = new Config(fc.getSelectedFile());
 					checkConfig.setEnabled(true);
-					checkConfig.setSelected(true);
-					if(dataModel.size()>0)
+					if(listAif.getSelectedIndex()>-1)
 					{
-						markMeasureToWaste();
+						checkConfig.setSelected(true);
 					}
 				}
 			}
@@ -263,7 +280,7 @@ public final class PanelDivers extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 				final JFileChooser chooser = new JFileChooser();
-				chooser.setDialogTitle("Sélection dossier");
+				chooser.setDialogTitle("Selection dossier");
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
 				if (chooser.showSaveDialog(PanelDivers.this) == JFileChooser.APPROVE_OPTION) {
@@ -291,25 +308,61 @@ public final class PanelDivers extends JPanel {
 		});
 
 		final TableMeasure tabMeasure = new TableMeasure();
+		
+		tabMeasure.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = tabMeasure.rowAtPoint(e.getPoint());
+				int col = tabMeasure.columnAtPoint(e.getPoint());
+				
+				if(col == 1)
+				{
+					Measure theMeasure = (Measure)measureModel.getValueAt(row, 0);
+					List<String> dataset = new ArrayList<>();
+					dataset.add(theMeasure.getName());
+					
+					if(theMeasure.getWasted())
+					{
+						markMeasureToWaste(dataset);
+					}else{
+						unMarkMeasureToWaste(theMeasure);
+					}
+					
+				}
+			}
+		});
 		measureModel = (MeasureModel) tabMeasure.getModel();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.gridwidth = 2;
 		gbc.gridheight = 1;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
-		gbc.insets = new Insets(5, 5, 0, 0);
+		gbc.insets = new Insets(5, 5, 0, 5);
 		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
 		add(new JScrollPane(tabMeasure), gbc);
 
 	}
 
-	private final void markMeasureToWaste(){
+	private final void markMeasureToWaste(List<String> datasets){
+		
 		Measure measureToWaste;
-		for(int i = 0; i < dataModel.size(); i++)
+		
+		if(listAif.getSelectedIndex()==-1)
 		{
-			for(String dataset : config.getDatasets())
+			return;
+		}
+		
+		int begin = checkApply.isSelected() ? 0 : listAif.getSelectedIndex();
+		int end = checkApply.isSelected() ? dataModel.size() : listAif.getSelectedIndex()+1;
+		
+		
+		
+		for(int i = begin; i < end; i++)
+		{
+			for(String dataset : datasets)
 			{
 				measureToWaste = new Measure(dataset);
 				int idx = dataModel.get(i).getMeasures().indexOf(measureToWaste);
@@ -323,13 +376,33 @@ public final class PanelDivers extends JPanel {
 		measureModel.fireTableDataChanged();
 	}
 
-	private final void unMarkMeasureToWaste(){
-		for(int i = 0; i < dataModel.size(); i++)
+	private final void unMarkMeasureToWaste(Measure theMeasure){
+		
+		if(listAif.getSelectedIndex()==-1)
 		{
-			for(Measure measure : dataModel.get(i).getMeasures())
+			return;
+		}
+		
+		int begin = checkApply.isSelected() ? 0 : listAif.getSelectedIndex();
+		int end = checkApply.isSelected() ? dataModel.size() : listAif.getSelectedIndex()+1;
+		
+		for(int i = begin; i < end; i++)
+		{
+			if(theMeasure != null)
 			{
-				measure.setWasted(false);
+				int idx = dataModel.get(i).getMeasures().indexOf(theMeasure);
+				if(idx>=-1)
+				{
+					dataModel.get(i).getMeasures().get(idx).setWasted(false);
+				}
+			}else{
+				for(Measure measure : dataModel.get(i).getMeasures())
+				{
+					measure.setWasted(false);
+				}
 			}
+			
+			
 		}
 		measureModel.fireTableDataChanged();
 	}
