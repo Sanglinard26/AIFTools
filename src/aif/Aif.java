@@ -44,11 +44,7 @@ public final class Aif {
             this.name = file.getName().substring(0, file.getName().length() - 4);
             this.fileSize = file.length();
 
-            long start = System.currentTimeMillis();
-
             parse(file, removeInvalidPoints);
-
-            System.out.println("Temps : " + (System.currentTimeMillis() - start) + " ms");
         }
     }
 
@@ -189,19 +185,16 @@ public final class Aif {
     public final long getFileSize() {
         return fileSize;
     }
-    
-    public final void removeWasteMeasure()
-    {
-    	Measure measure;
-    	
-    	for(int i = this.datas.size()-1; i >= 0 ; i--)
-    	{
-    		measure = this.datas.get(i);
-    		if(measure.getWasted())
-    		{
-    			this.datas.remove(measure);
-    		}
-    	}
+
+    public final void removeWasteMeasure() {
+        Measure measure;
+
+        for (int i = this.datas.size() - 1; i >= 0; i--) {
+            measure = this.datas.get(i);
+            if (measure.getWasted()) {
+                this.datas.remove(measure);
+            }
+        }
     }
 
     /**
