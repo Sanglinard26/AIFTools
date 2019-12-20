@@ -52,6 +52,7 @@ public final class PanelDivers extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private static final String FOLDER = "/icon_folder_32.png";
+    private static final String CORBEILLE = "/icon_corbeille_32.png";
     private static final String SAVE = "/icon_save_32.png";
     private static final String CONFIG = "/icon_config_32.png";
 
@@ -73,7 +74,7 @@ public final class PanelDivers extends JPanel {
         checkApply.setHorizontalTextPosition(SwingConstants.LEFT);
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
         gbc.weightx = 0;
@@ -87,7 +88,7 @@ public final class PanelDivers extends JPanel {
         checkConfig.setEnabled(false);
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
         gbc.weightx = 0;
@@ -188,11 +189,11 @@ public final class PanelDivers extends JPanel {
 
         dataModel = new DefaultListModel<Aif>();
         listAif = new JList<Aif>(dataModel);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.gridheight = 3;
+        gbc.gridheight = 4;
         gbc.weightx = 1;
         gbc.weighty = 0;
         gbc.insets = new Insets(5, 5, 0, 5);
@@ -306,6 +307,26 @@ public final class PanelDivers extends JPanel {
             }
         });
 
+        final JButton btClear = new JButton(new ImageIcon(getClass().getResource(CORBEILLE)));
+        btClear.setToolTipText("Effacer le tableau");
+        btClear.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dataModel.clear();
+            }
+        });
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        add(btClear, gbc);
+
         final TableMeasure tabMeasure = new TableMeasure();
 
         tabMeasure.addMouseListener(new MouseAdapter() {
@@ -371,9 +392,9 @@ public final class PanelDivers extends JPanel {
         });
 
         PanRename panRename = new PanRename();
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
         gbc.weightx = 0;
@@ -384,11 +405,11 @@ public final class PanelDivers extends JPanel {
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
         gbc.weightx = 0;
-        gbc.weighty = 0;
+        gbc.weighty = 1;
         gbc.insets = new Insets(5, 5, 0, 5);
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         add(new JScrollPane(tabMeasure), gbc);
@@ -431,7 +452,7 @@ public final class PanelDivers extends JPanel {
         for (int i = begin; i < end; i++) {
             if (theMeasure != null) {
                 int idx = dataModel.get(i).getMeasures().indexOf(theMeasure);
-                if (idx >= -1) {
+                if (idx > -1) {
                     dataModel.get(i).getMeasures().get(idx).setWasted(false);
                 }
             } else {
@@ -487,7 +508,7 @@ public final class PanelDivers extends JPanel {
             add(labelReplace, gbc);
 
             txtSearch = new JTextField(10);
-            gbc.fill = GridBagConstraints.NONE;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridx = 1;
             gbc.gridy = 0;
             gbc.gridwidth = 1;
@@ -499,7 +520,7 @@ public final class PanelDivers extends JPanel {
             add(txtSearch, gbc);
 
             txtReplace = new JTextField(10);
-            gbc.fill = GridBagConstraints.NONE;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridx = 1;
             gbc.gridy = 1;
             gbc.gridwidth = 1;
@@ -517,7 +538,7 @@ public final class PanelDivers extends JPanel {
             gbc.gridy = 0;
             gbc.gridwidth = 1;
             gbc.gridheight = 2;
-            gbc.weightx = 0;
+            gbc.weightx = 1;
             gbc.weighty = 0;
             gbc.insets = new Insets(5, 5, 0, 0);
             gbc.anchor = GridBagConstraints.FIRST_LINE_START;
