@@ -2,14 +2,19 @@ package utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public abstract class Utilitaire {
 
-    public final static String XML = "xml";
-    public final static String LAB = "lab";
-    public final static String A2L = "a2l";
-    public final static String DCM = "dcm";
-    public final static String M = "m";
+    private static Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+
+    public final static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+
+        return pattern.matcher(strNum).matches();
+    }
 
     /*
      * Get the extension of a file.

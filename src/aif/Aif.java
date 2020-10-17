@@ -34,7 +34,7 @@ public final class Aif {
         this.datas = datas;
 
         for (Measure measure : this.datas) {
-            this.nbPoints = Math.max(this.nbPoints, measure.getData().size());
+            this.nbPoints = Math.max(this.nbPoints, measure.getNbPoints());
         }
     }
 
@@ -101,18 +101,16 @@ public final class Aif {
                         break;
 
                     default:
-                        if (splitTab.length == this.datas.size()) {
 
-                            for (int idxCol = 0; idxCol < splitTab.length; idxCol++) {
-                                parsedValue = splitTab[idxCol].trim().replace(',', '.');
-                                if (REGEX_STAR.matcher(parsedValue).matches()) {
-                                    removePoint.add(this.datas.get(idxCol).getData().size());
-                                    this.datas.get(idxCol).getData().add(String.valueOf(Double.NaN));
-                                } else {
-                                    this.datas.get(idxCol).getData().add(parsedValue);
-                                }
-
+                        for (int idxCol = 0; idxCol < splitTab.length; idxCol++) {
+                            parsedValue = splitTab[idxCol];
+                            if (REGEX_STAR.matcher(parsedValue).matches()) {
+                                removePoint.add(this.datas.get(idxCol).getData().size());
+                                this.datas.get(idxCol).getData().add(Float.NaN);
+                            } else {
+                                this.datas.get(idxCol).getData().add(Measure.getStorageObject(parsedValue));
                             }
+
                         }
                         break;
                     }
@@ -132,16 +130,16 @@ public final class Aif {
                         measure.getData().remove(idxPoint);
                     }
 
-                    if (measure.getName().equals("LOGPT")) {
+                    if ("LOGPT".equals(measure.getName())) {
                         for (int numPoint = 0; numPoint < measure.getData().size(); numPoint++) {
-                            measure.getData().set(numPoint, Integer.toString(numPoint + 1));
+                            measure.getData().set(numPoint, numPoint + 1);
                         }
                     }
                 }
             }
 
             for (Measure measure : this.datas) {
-                this.nbPoints = Math.max(this.nbPoints, measure.getData().size());
+                this.nbPoints = Math.max(this.nbPoints, measure.getNbPoints());
             }
 
         } catch (FileNotFoundException e) {
@@ -253,8 +251,10 @@ public final class Aif {
                         }
 
                         if (i > -1) {
-                            if (!measure.getName().equals("LOGPT")) {
-                                measure.getData().add(oldMeasure.getData().get(i));
+                            if (!"LOGPT".equals(measure.getName())) {
+                                if (i < oldMeasure.getNbPoints()) {
+                                    measure.getData().add(oldMeasure.getData().get(i));
+                                }
                             } else {
                                 measure.getData().add(Integer.toString(cntPoint));
                                 cntPoint++;
