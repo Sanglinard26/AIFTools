@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -195,6 +196,17 @@ public final class Aif {
         }
     }
 
+    public final BitSet isWholeLineValid() {
+
+        BitSet fullCondition = new BitSet(getNbPoints());
+        fullCondition.flip(0, getNbPoints());
+
+        for (int i = 0; i < datas.size(); i++) {
+            fullCondition.and(datas.get(i).getBitCondition());
+        }
+        return fullCondition;
+    }
+
     /**
      * @param listAif : Une liste d'Aif
      * @return Un nouvel Aif avec la compilation des Aif entrants
@@ -294,15 +306,28 @@ public final class Aif {
             }
             printWriter.print("\n");
 
+            BitSet fullCondition = aif.isWholeLineValid();
+
+            int cntPoint = 1;
+
             for (int nData = 0; nData < aif.getNbPoints(); nData++) {
-                for (Measure measure : aif.getMeasures()) {
-                    if (nData < measure.getData().size()) {
-                        printWriter.print(measure.getData().get(nData) + "\t");
-                    } else {
-                        printWriter.print("NaN" + "\t");
+
+                if (fullCondition.get(nData)) {
+                    for (Measure measure : aif.getMeasures()) {
+                        if (nData < measure.getData().size()) {
+                            if (!"LOGPT".equals(measure.getName())) {
+                                printWriter.print(measure.getData().get(nData) + "\t");
+                            } else {
+                                printWriter.print(cntPoint++ + "\t");
+                            }
+
+                        } else {
+                            printWriter.print("NaN" + "\t");
+                        }
                     }
+                    printWriter.print("\n");
                 }
-                printWriter.print("\n");
+
             }
 
         } catch (Exception e) {

@@ -207,8 +207,10 @@ public final class PanelDivers extends JPanel {
 
                     measureModel.clearList();
 
-                    for (Measure measure : listAif.getSelectedValue().getMeasures()) {
-                        measureModel.addElement(measure);
+                    if (!dataModel.isEmpty() && listAif.getSelectedIndex() > -1) {
+                        for (Measure measure : listAif.getSelectedValue().getMeasures()) {
+                            measureModel.addElement(measure);
+                        }
                     }
                 }
 
@@ -289,10 +291,17 @@ public final class PanelDivers extends JPanel {
                         @Override
                         public void run() {
 
+                            if (measureModel.getRowCount() < 1) {
+                                return;
+                            }
+
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
                             for (int i = 0; i < dataModel.size(); i++) {
                                 dataModel.get(i).removeWasteMeasure();
+                                for (int j = 0; j < dataModel.get(i).getMeasures().size(); j++) {
+                                    measureModel.getConditions().get(j).applyCondition();
+                                }
                                 Aif.writeAif(new File(chooser.getSelectedFile() + "\\" + dataModel.get(i).toString() + "_new.aif"), dataModel.get(i));
                             }
 
