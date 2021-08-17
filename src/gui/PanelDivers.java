@@ -395,7 +395,6 @@ public final class PanelDivers extends JPanel {
 
             @Override
             public void editingCanceled(ChangeEvent e) {
-                // TODO Auto-generated method stub
 
             }
         });

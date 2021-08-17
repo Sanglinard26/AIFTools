@@ -36,6 +36,7 @@ public final class Aif {
 
         for (Measure measure : this.datas) {
             this.nbPoints = Math.max(this.nbPoints, measure.getNbPoints());
+            measure.applyCondition(0, measure.getData().size());
         }
     }
 
@@ -271,9 +272,12 @@ public final class Aif {
                                 measure.getData().add(Integer.toString(cntPoint));
                                 cntPoint++;
                             }
+
                         }
                     }
+
                 }
+
             }
         }
 
